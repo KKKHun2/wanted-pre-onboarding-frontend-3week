@@ -46,7 +46,8 @@ function SerchInputPage() {
       }  
     } 
   }
-  const fetchData = ()  =>{
+
+  const fetchData = () =>{
     return fetch(
       `http://localhost:4000/sick`
     )
@@ -56,6 +57,8 @@ function SerchInputPage() {
     includes(data:string): boolean;
     sickNm?: any;
   }
+
+  // 리스트 나오게
   const updateData = async() => {
     const res = await fetchData();
     let sickName = res.filter((list: IsickNm) => list.sickNm.includes(keyword) === true)
@@ -66,6 +69,7 @@ function SerchInputPage() {
   useEffect(() => {
     updateData();
     },[debounceValue])
+
   return (
     <Container>
       <TitleText>
@@ -93,7 +97,19 @@ function SerchInputPage() {
               setKeyword(search.sickNm);
              }}>
               <SerchIcon />
-             {search.sickNm}
+             {search.sickNm
+             .replaceAll(keyword,`#$%${keyword}#$%`)
+             .split('#$%')
+             .map((e: string) => (
+              <span
+                    key={search.sickNm}
+                    style={{ fontWeight: e === keyword ? '700' : '300' }}
+                  >
+                    {e}
+                  </span>
+             )
+             )
+}
            </AutoSearchData>
           ))}
           </AutoSearchWrap>

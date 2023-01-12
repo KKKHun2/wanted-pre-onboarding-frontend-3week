@@ -1,12 +1,12 @@
 import React from 'react';
-import SerchInput from './component/SerchInput';
+import SerchInputPage from './component/SerchInputPage';
 import { GlobalStyle } from './Globalstyles';
 
 function App() {
   return (
     <>
     <GlobalStyle />
-    <SerchInput />
+    <SerchInputPage />
     </>
     
 

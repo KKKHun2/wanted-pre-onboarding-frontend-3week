@@ -1,19 +1,16 @@
 import React from 'react'
 import styled from 'styled-components';
 import { useEffect,useState,useRef } from 'react';
+import {GrSearch} from "react-icons/gr"
+import UseDebounce from "./UseDebounce"
+
 
 interface autoDatas {
   sickNm: string;
-  growth_from_2000_to_2013: string;
-  latitude:number;
-  longitude:number;
-  population:string;
-  rank:string;
-  state:string;
 }
 
-function SerchInput() {
-  const [keyword, setKeyword] = useState<string>("");
+function SerchInputPage() {
+    const [keyword, setKeyword] = useState<string>("");
     const [index,setIndex] = useState<number>(-1);
     const [keyItems, setKeyItems] = useState<autoDatas[]>([]);
     const autoRef = useRef<HTMLUListElement>(null);
@@ -21,11 +18,14 @@ function SerchInput() {
     setKeyword(e.currentTarget.value);
   };
 
-  const handleKeyArrow = (e:React.KeyboardEvent) => {
+    const debounceValue = UseDebounce(keyword);
+
+    /// 리스트 위아래 내리기 기능
+    const handleKeyArrow = (e:React.KeyboardEvent) => {
     
     const ArrowDown = "ArrowDown";
-const ArrowUp = "ArrowUp";
-const Escape = "Escape";
+    const ArrowUp = "ArrowUp";
+    const Escape = "Escape";
     if (keyItems.length > 0) {
       switch (e.key) {
         case ArrowDown:
@@ -60,12 +60,12 @@ const Escape = "Escape";
     const res = await fetchData();
     let sickName = res.filter((list: IsickNm) => list.sickNm.includes(keyword) === true)
                 .slice(0,12);
-    // console.log(b);
+                console.info("calling api")
     setKeyItems(sickName);
   }
   useEffect(() => {
     updateData();
-    },[keyword])
+    },[debounceValue])
   return (
     <Container>
       <TitleText>
@@ -77,36 +77,32 @@ const Escape = "Escape";
       placeholder="질환명을 입력해주세요."
       value={keyword} onChange={onChangeData} onKeyDown={handleKeyArrow}
       />
-      
-    <SerchBtn
-    >검색</SerchBtn>
-    </SerchForm>
-    <SerchText>
-    {keyword.length > 0 ? <SerchInfoText>추천 검색어</SerchInfoText>:""}
-    {keyItems.length > 0 && keyword && (
-      
-    <AutoSearchWrap ref={autoRef}>
-    {keyItems.map((search, idx) => (
-      
+      <SerchBtn>검색</SerchBtn>
+      </SerchForm>
+      <SerchText>
+        {keyword.length > 0 ? <SerchInfoText>추천 검색어</SerchInfoText>:""}
+        {keyword.length > 0 && !(keyItems.length) ? 
+      <SerchInfoText className="text2">일치하는 검색어가 없습니다.</SerchInfoText>:""}
+        {keyItems.length > 0 && keyword && (
+         <AutoSearchWrap ref={autoRef}>
+          {keyItems.map((search, idx) => (
            <AutoSearchData
-           	isFocus={index === idx ? true : false}
-            key={search.sickNm}
-            onClick={() => {
-            setKeyword(search.sickNm);
-           }}
-            >
-              
-            <a href="#">{search.sickNm}</a>
+            	isFocus={index === idx ? true : false}
+              key={search.sickNm}
+              onClick={() => {
+              setKeyword(search.sickNm);
+             }}>
+              <SerchIcon />
+             {search.sickNm}
            </AutoSearchData>
           ))}
           </AutoSearchWrap>
            )}
       </SerchText>
-   
     </Container>
   )}
 
-export default SerchInput
+export default SerchInputPage
 
 const Container = styled.div`
   display: flex;
@@ -116,6 +112,11 @@ const Container = styled.div`
   flex-direction: column;
   height: 100vh;
   width: 100vw;
+  .text2{
+    font-size: 17px;
+    margin-left: 12em;
+    color:black;
+  }
 `;
 
 const TitleText = styled.div`
@@ -126,7 +127,7 @@ const TitleText = styled.div`
   text-align: center;
   line-height: 1.4em;
   margin-bottom: 1em;
-  margin-top: 3em;
+  margin-top: 2em;
 `;
 
 const SerchForm = styled.form`
@@ -149,6 +150,10 @@ const SerchText = styled.div`
   margin-bottom: 5em;
 `;
 
+const SerchIcon = styled(GrSearch)`
+  height: 20px;
+  margin: 0em 0.7em -0.38em 1em;
+`
 const SerchInfoText= styled.div`
   display: flex;
   font-size: 0.8em;
@@ -184,9 +189,8 @@ const SerchBtn = styled.div`
   border-radius: 0px 30px 30px 0px;
   cursor: pointer;
   text-align: center;
-
   &:hover {
-    background-color: #315def;
+    background-color: #a4c9f4;
   }
 `;
 const AutoSearchWrap = styled.ul`
@@ -200,17 +204,11 @@ const AutoSearchData = styled.li<{isFocus?: boolean}>`
   z-index: 4;
   letter-spacing: 2px;
   border-radius: 10px;
+  color:black;
   &:hover {
-    background-color: #edf5f5;
+    background-color: #a4c9f4;
     cursor: pointer;
   }
-  background-color: ${props => props.isFocus? "#edf5f5" : "#fff"};
+  background-color: ${props => props.isFocus? "#a4c9f4" : "#fff"};
   position: relative;
-  img {
-    position: absolute;
-    right: 5px;
-    width: 18px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
 `;
